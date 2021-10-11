@@ -2,7 +2,7 @@
 set -e
 
 #################################################################################
-# This script is a part of https://github.com/kiler129/relax-intel-rmrr project #
+# This script is a part of https://github.com/mikejcKS/relax-intel-rmrr project #
 #################################################################################
 
 
@@ -38,7 +38,7 @@ else
   apt -y update
   apt -y install gnupg
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7BF2812E8A6E88E0
-  echo 'deb http://download.proxmox.com/debian/pve buster pve-no-subscription' > /etc/apt/sources.list.d/pve.list
+  echo 'deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription' > /etc/apt/sources.list.d/pve.list
 fi
 
 # Install all packages required to build the kernel & create *.deb packages for installation
@@ -47,7 +47,7 @@ apt -y update
 apt -y install git nano screen patch fakeroot build-essential devscripts libncurses5 libncurses5-dev libssl-dev bc \
  flex bison libelf-dev libaudit-dev libgtk2.0-dev libperl-dev asciidoc xmlto gnupg gnupg2 rsync lintian debhelper \
  libdw-dev libnuma-dev libslang2-dev sphinx-common asciidoc-base automake cpio dh-python file gcc kmod libiberty-dev \
- libpve-common-perl libtool perl-modules python-minimal sed tar zlib1g-dev lz4 curl
+ libpve-common-perl libtool perl-modules python2-minimal sed tar zlib1g-dev lz4 curl
 
 
 
@@ -61,8 +61,8 @@ cd proxmox-kernel
 
 # Clone official Proxmox kernel repo & Relaxed RMRR Mapping patch
 echo "Step 2.1: Downloading Proxmox kernel toolchain & patches"
-git clone --depth=1 -b pve-kernel-5.4 git://git.proxmox.com/git/pve-kernel.git
-git clone --depth=1 https://github.com/kiler129/relax-intel-rmrr.git
+git clone --depth=1 -b pve-kernel-5.11 git://git.proxmox.com/git/pve-kernel.git
+git clone --depth=1 https://github.com/mikejcKS/relax-intel-rmrr.git
 
 # Go to the actual Proxmox toolchain
 cd pve-kernel
@@ -73,10 +73,10 @@ cd pve-kernel
 #  bypasses the process safely.
 # This curl skips certificate validation because Proxmox GIT WebUI doesn't send Let's Encrypt intermediate cert
 echo "Step 2.2: Downloading base kernel"
-curl -f -k "https://git.proxmox.com/?p=mirror_ubuntu-focal-kernel.git;a=snapshot;h=$(git submodule status submodules/ubuntu-focal | cut -c 2-41);sf=tgz" --output kernel.tgz || true
+curl -f -k "https://git.proxmox.com/?p=mirror_ubuntu-impish-kernel.git;a=snapshot;h=$(git submodule status submodules/ubuntu-impish | cut -c 2-41);sf=tgz" --output kernel.tgz || true
 
 if [[ -f "kernel.tgz" ]]; then
-  tar -xf kernel.tgz -C submodules/ubuntu-focal/ --strip 1
+  tar -xf kernel.tgz -C submodules/ubuntu-impish/ --strip 1
   rm kernel.tgz
 else
   echo "[-] Failed to download flat base kernel (will use git instead)"
@@ -93,7 +93,7 @@ patch -p1 < ../relax-intel-rmrr/patches/proxmox.patch
 
 
 echo "Step 3.1: Compiling kernel... (it will take 30m-3h)"
-# Note: DO NOT add -j to this make, see https://github.com/kiler129/relax-intel-rmrr/issues/1
+# Note: DO NOT add -j to this make, see https://github.com/mikejcKS/relax-intel-rmrr/issues/1
 # This step will compile kernel & build all *.deb packages as Proxmox builds internally
 make
 
