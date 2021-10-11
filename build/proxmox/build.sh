@@ -37,7 +37,7 @@ else
   echo "Step 1.0: Adding Proxmox apt repository..."
   apt -y update
   apt -y install gnupg
-  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7BF2812E8A6E88E0
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DD4BA3917E23BF59
   echo 'deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription' > /etc/apt/sources.list.d/pve.list
 fi
 
